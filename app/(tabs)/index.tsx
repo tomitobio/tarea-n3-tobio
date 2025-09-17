@@ -1,98 +1,132 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+function Card({ tarjeta }) {
+  const [active, setActive] = useState(false);
+
+  return (
+    <Pressable
+      onPress={() => setActive(!active)}
+      style={[
+        styles.cardBox,
+        active ? styles.cardBoxActive : styles.cardBoxInactive
+      ]}
+    >
+      <Text style={[styles.cardText, active ? styles.textActive : styles.textInactive ]}>
+        {tarjeta}
+      </Text>
+    </Pressable>
+  );
+}
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const [cards, setCards] = useState(['Tarjeta 1']);
+  const maxCards = 3;
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  function addCard() {
+    if (cards.length < maxCards) {
+      const nextNumber = cards.length + 1;
+      setCards([...cards, `Tarjeta ${nextNumber}`]);
+    }
+    else {
+      alert('Número máximo de tarjetas alcanzado');
+    }
+  }
+
+  function removeCard() {
+    if (cards.length > 0) {
+      setCards(cards.slice(0, -1));
+    }
+  }
+
+  return (
+    <View style={styles.titleContainer}>
+      <Text style={styles.titleText}>Tarjetas</Text>
+      {cards.map((text, index) => (
+        <Card key={index} tarjeta={text} />
+      ))}
+      <Pressable onPress={addCard} style={styles.addButton}>
+        <Text style={styles.addButtonText}>Agregar tarjeta</Text>
+      </Pressable>
+      <Pressable onPress={removeCard} style={styles.removeButton}>
+        <Text style={styles.removeButtonText}>Borrar tarjeta</Text>
+      </Pressable>
+      <Text style={[styles.infoText, styles.infoBox ]}>
+        {cards.length}/{maxCards} tarjetas máximas
+      </Text>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   titleContainer: {
-    flexDirection: 'row',
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
+    backgroundColor: '#ffffffff',
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  titleText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'dark gray',
+    marginBlock: 20,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  cardText: {
+    fontSize: 20,
+    color: 'black',
+  },
+  cardBox: {
+    marginTop: 30,
+    padding: 30,
+    width: 200,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addButton: {
+    marginTop: 40,
+    padding: 10,
+    width: 120,
+    alignItems: 'center',
+    borderRadius: 5,
+    backgroundColor: '#2196F3',
+  },
+  addButtonText: {
+    color: '#ecececff',
+    fontSize: 12,
+  },
+  removeButton: {
+    marginTop: 10,
+    padding: 10,
+    width: 120,
+    alignItems: 'center',
+    borderRadius: 5,
+    backgroundColor: '#e25959ff',
+  },
+  removeButtonText: {
+    color: '#252525ff',
+    fontSize: 12,
+  },
+  cardBoxActive: {
+    backgroundColor: '#5c8b64ff',
+  },
+  cardBoxInactive: {
+    backgroundColor: '#ce916eff',
+  },
+  textActive: {
+    color: '#ffffffff',
+  },
+  textInactive: {
+    color: '#000000ff',
+  },
+  infoBox: {
+    marginTop: 20,
+    padding: 10,
+    borderRadius: 5,
+    width: 100,
+  },
+  infoText: {
+    fontSize: 12,
+    textAlign: 'center',
+    backgroundColor: '#d3d3d3ff',
   },
 });
